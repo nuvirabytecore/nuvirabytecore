@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NuviraByteCore</title>
+  <style>
+
+</style>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --black: #0a0a0a;
+      --white: #fafafa;
+      --accent: #c8f060;
+      --gray: #e8e8e8;
+      --mid: #888;
+      --radius: 4px;
+      --transition: 0.22s ease;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', sans-serif;
+      background: var(--white);
+      color: var(--black);
+      font-size: 15px;
+      line-height: 1.6;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--white);
+      border-bottom: 1px solid var(--gray);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 48px;
+      height: 60px;
+    }
+
+    .nav-logo-sub { display: block; font-size: 10px; font-weight: 400; letter-spacing: 0.04em; color: var(--mid); line-height: 1.2; }
+
+    .nav-logo {
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', sans-serif;
+      font-weight: 800;
+      font-size: 20px;
+      letter-spacing: -0.5px;
+      text-decoration: none;
+      color: var(--black);
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 36px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      text-decoration: none;
+      color: var(--black);
+      font-size: 14px;
+      font-weight: 500;
+      letter-spacing: 0.02em;
+      transition: color var(--transition);
+    }
+
+    .nav-links a:hover { color: var(--mid); }
+
+    /* ── HERO ── */
+    .hero {
+      padding: 56px 48px 48px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .hero h1 {
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', sans-serif;
+      font-size: clamp(40px, 6vw, 72px);
+      font-weight: 800;
+      line-height: 1.05;
+      letter-spacing: -2px;
+      margin-bottom: 20px;
+    }
+
+    .hero p {
+      color: #555;
+      font-size: 16px;
+      line-height: 1.7;
+      margin-bottom: 36px;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .btn-primary {
+      background: var(--black);
+      color: var(--white);
+      border: none;
+      padding: 14px 28px;
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', sans-serif;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      border-radius: var(--radius);
+      transition: background var(--transition), transform var(--transition);
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    .btn-primary:hover { background: #222; transform: translateY(-2px); }
+
+    .btn-tg {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-tg:hover { background: #0088cc; transform: translateY(-2px); }
+
+    /* ── SECTION COMMON ── */
+    .section-header {
+      max-width: 1200px;
+      margin: 0 auto 24px;
+      padding: 0 48px;
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+    }
+
+    .section-title {
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', sans-serif;
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+    }
+
+    .section-link {
+      font-size: 13px;
+      color: var(--mid);
+      text-decoration: none;
+      transition: color var(--transition);
+    }
+
+    .section-link:hover { color: var(--black); }
+
+    /* ── PREMIUM WALLPAPERS ── */
+    #wallpapers {
+      padding: 40px 0;
+      border-bottom: 1px solid var(--gray);
+    }
+
+    .wallpapers-row {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 48px;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+    }
+
+    .wallpaper-card {
+      cursor: pointer;
+      border-radius: 10px;
+      overflow: hidden;
+      position: relative;
+      transition: transform var(--transition), box-shadow var(--transition);
+      text-decoration: none;
+      display: block;
+    }
+
+    .wallpaper-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 16px 40px rgba(0,0,0,0.12);
+    }
+
+    .wallpaper-thumb {
+      aspect-ratio: 16/10;
+      background: var(--gray);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .wallpaper-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.4s ease;
+    }
+
+    .wallpaper-card:hover .wallpaper-thumb img { transform: scale(1.03); }
+
+    .wallpaper-overlay {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      background: linear-gradient(to top, rgba(0,0,0,0.72) 0%, transparent 100%);
+      padding: 20px 18px 16px;
+      color: var(--white);
+    }
+
+    .wallpaper-name {
+      font-weight: 700;
+      font-size: 16px;
+      letter-spacing: -0.3px;
+      margin-bottom: 4px;
+    }
+
+    .wallpaper-meta { font-size: 12px; color: rgba(255,255,255,0.65); }
+
+    .wallpaper-badge {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      background: var(--accent);
+      color: var(--black);
+      font-size: 10px;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 100px;
+      letter-spacing: 0.06em;
+      z-index: 2;
+    }
+
+    /* ── WALLS ── */
+    #walls {
+      padding: 40px 0;
+      border-bottom: 1px solid var(--gray);
+    }
+
+    .walls-row {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 48px;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+    }
+
+    .walls-card {
+      border-radius: 10px;
+      overflow: hidden;
+      background: var(--gray);
+      text-decoration: none;
+      display: block;
+      transition: transform var(--transition), box-shadow var(--transition);
+    }
+
+    .walls-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 16px 40px rgba(0,0,0,0.12);
+    }
+
+    .walls-card img {
+      width: 100%;
+      height: auto;
+      display: block;
+      transition: transform 0.4s ease;
+    }
+
+    .walls-card:hover img { transform: scale(1.03); }
+
+    /* ── CORE ── */
+    #core { padding: 40px 0; border-bottom: 1px solid var(--gray); }
+
+    .core-row {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 48px;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+    }
+
+    .core-card {
+      border: 1.5px solid var(--gray);
+      border-radius: 10px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: border-color var(--transition), transform var(--transition), box-shadow var(--transition);
+      position: relative;
+      background: var(--white);
+      text-decoration: none;
+      display: block;
+    }
+
+    .core-card:hover {
+      border-color: var(--black);
+      transform: translateY(-3px);
+      box-shadow: 0 12px 32px rgba(0,0,0,0.08);
+    }
+
+    .core-card-thumb {
+      overflow: hidden;
+      background: var(--gray);
+      position: relative;
+    }
+
+    .core-card-thumb img {
+      width: 100%;
+      height: auto;
+      display: block;
+      transition: transform 0.4s ease;
+    }
+
+    .core-card:hover .core-card-thumb img { transform: scale(1.03); }
+
+    .core-card-badge {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      background: var(--accent);
+      color: var(--black);
+      font-size: 10px;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 100px;
+      letter-spacing: 0.06em;
+      z-index: 2;
+    }
+
+    .core-card-body {
+      padding: 18px 20px 20px;
+    }
+
+    .core-card-title {
+      font-weight: 700;
+      font-size: 16px;
+      letter-spacing: -0.2px;
+      margin-bottom: 6px;
+      color: var(--black);
+    }
+
+    .core-card-desc { font-size: 13px; color: #666; line-height: 1.65; }
+
+    /* ── ABOUT ── */
+    #about {
+      padding: 80px 48px;
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 80px;
+      align-items: center;
+      border-top: 1px solid var(--gray);
+    }
+
+    .about-visual {
+      background: var(--black);
+      border-radius: 12px;
+      aspect-ratio: 4/3;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .about-visual::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, #111 0%, #222 100%);
+    }
+
+    .big-letter {
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', sans-serif;
+      font-size: 200px;
+      font-weight: 800;
+      color: rgba(255,255,255,0.05);
+      line-height: 1;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      user-select: none;
+    }
+
+    .about-content .section-tag {
+      display: inline-block;
+      background: var(--accent);
+      color: var(--black);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 4px 12px;
+      border-radius: 100px;
+      margin-bottom: 20px;
+    }
+
+    .about-content h2 {
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', sans-serif;
+      font-size: 34px;
+      font-weight: 800;
+      letter-spacing: -1px;
+      line-height: 1.15;
+      margin-bottom: 20px;
+    }
+
+    .about-content p { color: #555; line-height: 1.75; margin-bottom: 16px; }
+
+    .about-features {
+      margin-top: 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .about-feature {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .about-feature::before {
+      content: '✓';
+      background: var(--accent);
+      color: var(--black);
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      border-top: 1px solid var(--gray);
+      padding: 28px 48px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .footer-logo {
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', sans-serif;
+      font-weight: 800;
+      font-size: 18px;
+      letter-spacing: -0.5px;
+    }
+
+    .footer-links { display: flex; gap: 28px; list-style: none; }
+
+    .footer-links a {
+      text-decoration: none;
+      color: var(--mid);
+      font-size: 13px;
+      transition: color var(--transition);
+    }
+
+    .footer-links a:hover { color: var(--black); }
+
+    .footer-copy { font-size: 14px; color: var(--mid); }
+
+    /* ── BURGER + DRAWER ── */
+    .burger {
+      display: none;
+      flex-direction: column;
+      justify-content: center;
+      gap: 5px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 4px;
+      width: 36px;
+      height: 36px;
+    }
+
+    .burger span {
+      display: block;
+      width: 22px;
+      height: 2px;
+      background: var(--black);
+      border-radius: 2px;
+      transition: transform 0.25s ease, opacity 0.25s ease;
+      transform-origin: center;
+    }
+
+    .burger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .burger.open span:nth-child(2) { opacity: 0; }
+    .burger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+    .drawer-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 300;
+      background: rgba(0,0,0,0.25);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+    }
+
+    .drawer-overlay.visible {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .drawer {
+      position: fixed;
+      top: 60px;
+      right: 0;
+      z-index: 400;
+      background: var(--white);
+      border-left: 1px solid var(--gray);
+      border-bottom: 1px solid var(--gray);
+      border-radius: 0 0 0 12px;
+      min-width: 200px;
+      padding: 8px 0;
+      transform: translateX(110%);
+      transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      box-shadow: -4px 4px 24px rgba(0,0,0,0.08);
+    }
+
+    .drawer.open { transform: translateX(0); }
+
+    .drawer-links { list-style: none; }
+
+    .drawer-links a {
+      display: block;
+      padding: 13px 24px;
+      text-decoration: none;
+      color: var(--black);
+      font-size: 15px;
+      font-weight: 500;
+      transition: background var(--transition);
+    }
+
+    .drawer-links a:hover { background: var(--gray); }
+    .drawer-accordion { list-style: none; }
+    .drawer-accordion-btn {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      padding: 13px 24px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--black);
+      text-align: left;
+      transition: background var(--transition);
+    }
+    .drawer-accordion-btn:hover { background: var(--gray); }
+    .drawer-acc-arrow {
+      font-size: 14px;
+      color: var(--mid);
+      transition: transform 0.25s ease;
+      display: inline-block;
+    }
+    .drawer-accordion.open .drawer-acc-arrow { transform: rotate(90deg); }
+    .drawer-accordion-sub {
+      list-style: none;
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      background: var(--gray);
+    }
+    .drawer-accordion.open .drawer-accordion-sub { max-height: 120px; }
+    .drawer-accordion-sub li a {
+      display: block;
+      padding: 11px 24px 11px 36px;
+      text-decoration: none;
+      color: #444;
+      font-size: 14px;
+      font-weight: 500;
+      transition: background var(--transition);
+    }
+    .drawer-accordion-sub li a:hover { background: #ddd; }
+
+    @media (max-width: 900px) {
+      nav { padding: 0 20px; }
+      .nav-links { display: none !important; }
+      .burger { display: flex; }
+      .hero { padding: 60px 24px; }
+      .wallpapers-row { grid-template-columns: 1fr; padding: 0 20px; }
+      .walls-row { grid-template-columns: 1fr; padding: 0 20px; }
+      .core-row { grid-template-columns: 1fr; padding: 0 20px; }
+      .section-header { padding: 0 20px; }
+      footer { padding: 24px 20px; }
+      .mobile-hidden { display: none; }
+    }
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .hero-tag, .hero h1, .hero p, .hero-actions { animation: fadeUp 0.5s ease both; }
+    .hero h1 { animation-delay: 0.08s; }
+    .hero p { animation-delay: 0.14s; }
+    .hero-actions { animation-delay: 0.20s; }
+
+    /* ── DROPDOWN ── */
+    .nav-dropdown { position: relative; }
+    .nav-dropdown-toggle { display: inline-flex; align-items: center; gap: 4px; cursor: pointer; vertical-align: middle; }
+    .nav-arrow { font-size: 12px; color: var(--mid); transition: transform 0.2s ease; display: inline-block; }
+    .nav-dropdown.open .nav-arrow { transform: rotate(90deg); }
+    .nav-submenu {
+      position: absolute;
+      top: calc(100% + 12px);
+      left: 50%;
+      transform: translateX(-50%) translateY(-6px);
+      background: var(--white);
+      border: 1px solid var(--gray);
+      border-radius: 10px;
+      padding: 6px 0;
+      list-style: none;
+      min-width: 180px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.09);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.18s ease, transform 0.18s ease;
+    }
+    .nav-dropdown.open .nav-submenu {
+      opacity: 1;
+      pointer-events: all;
+      transform: translateX(-50%) translateY(0);
+    }
+    .nav-submenu li a {
+      display: block;
+      padding: 10px 18px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--black);
+      text-decoration: none;
+      white-space: nowrap;
+      transition: background 0.15s ease;
+    }
+    .nav-submenu li a:hover { background: var(--gray); color: var(--black) !important; }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <a href="index.html" class="nav-logo">
+      NuviraByteCore
+      <span class="nav-logo-sub">powered by Alex.Chuck</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="index.html">Главная</a></li>
+      <li><a href="core.html">Заметки</a></li>
+      <li class="nav-dropdown">
+        <a href="wallpapers.html" class="nav-dropdown-toggle">Обои <span class="nav-arrow">›</span></a>
+        <ul class="nav-submenu">
+          <li><a href="wallpapers.html">Premium Wallpapers</a></li>
+          <li><a href="walls.html">Walls</a></li>
+        </ul>
+      </li>
+      <li><a href="about.html">О NBC</a></li>
+    </ul>
+    <button class="burger" id="burgerBtn" aria-label="Меню">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+
+  <!-- MOBILE MENU DRAWER -->
+  <div class="drawer-overlay" id="drawerOverlay"></div>
+  <div class="drawer" id="drawer">
+    <ul class="drawer-links">
+      <li><a href="index.html">Главная</a></li>
+      <li><a href="core.html">Заметки</a></li>
+      <li class="drawer-accordion">
+        <button class="drawer-accordion-btn" id="drawerWallBtn">
+          Обои <span class="drawer-acc-arrow">›</span>
+        </button>
+        <ul class="drawer-accordion-sub" id="drawerWallSub">
+          <li><a href="wallpapers.html">Premium Wallpapers</a></li>
+          <li><a href="walls.html">Walls</a></li>
+        </ul>
+      </li>
+      <li><a href="about.html">О NBC</a></li>
+    </ul>
+  </div>
+
+  <!-- HERO -->
+  <section class="hero">
+    <h1>LESS IS MORE</h1>
+    <p>Здесь, заметки, обои и небольшие идеи.<br>Минимум шума, максимум хуйни.</p>
+    <div class="hero-actions">
+      <a href="about.html" class="btn-primary btn-tg">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="flex-shrink:0"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L8.32 14.617l-2.96-.924c-.643-.204-.657-.643.136-.953l11.57-4.461c.537-.194 1.006.131.828.942z"/></svg>
+        Подписаться на канал
+      </a>
+    </div>
+  </section>
+
+  <!--
+    ╔══════════════════════════════════════════════════════════════════╗
+    ║                  ИНСТРУКЦИЯ ПО РЕДАКТИРОВАНИЮ                   ║
+    ╠══════════════════════════════════════════════════════════════════╣
+    ║  На главной странице в секциях "Premium Wallpapers" и           ║
+    ║  "Заметки" отображается максимум 4 блока.                       ║
+    ║                                                                  ║
+    ║  Порядок: новые блоки идут ПЕРВЫМИ.                             ║
+    ║  При добавлении нового блока — удалить последний (4-й) блок     ║
+    ║  из главной страницы. Он останется на своей странице:           ║
+    ║    • Все обои  → wallpapers.html                                ║
+    ║    • Все заметки → core.html                                    ║
+    ║                                                                  ║
+    ║  Сортировка на страницах core.html и wallpapers.html:           ║
+    ║  новые блоки тоже добавляются ПЕРВЫМИ.                         ║
+    ╚══════════════════════════════════════════════════════════════════╝
+  -->
+  <!-- PREMIUM WALLPAPERS -->
+  <section id="wallpapers">
+    <div class="section-header">
+      <h2 class="section-title">Premium Wallpapers</h2>
+      <a href="wallpapers.html" class="section-link">Все обои →</a>
+    </div>
+    <div class="wallpapers-row">
+
+      <a href="wallpapers.html" class="wallpaper-card">
+        <div class="wallpaper-thumb">
+          <img src="https://i.ibb.co/C3KN5bYt/019-B2820-5-A46-72-B1-BD39-93868-EEEB0-C5.jpg" alt="3D Palette" />
+        </div>
+        <div class="wallpaper-overlay">
+          <div class="wallpaper-name">3D Palette</div>
+          <div class="wallpaper-meta">Premium Wallpaper Pack</div>
+        </div>
+      </a>
+
+      <a href="wallpapers.html" class="wallpaper-card">
+        <div class="wallpaper-thumb">
+          <img src="https://i.ibb.co/4ZTrq8tf/019-B1-D95-254-C-72-F9-9145-5-C1775-F854-A2.jpg" alt="Aqua" />
+        </div>
+        <div class="wallpaper-overlay">
+          <div class="wallpaper-name">Aqua</div>
+          <div class="wallpaper-meta">Premium Wallpaper Pack</div>
+        </div>
+      </a>
+
+      <a href="wallpapers.html" class="wallpaper-card mobile-hidden">
+        <div class="wallpaper-thumb">
+          <img src="https://i.ibb.co/qMYYPRH0/019-B15-C8-ECA4-72-D4-ABD3-935-EE3-E72-C8-D.jpg" alt="Grainy Gradients" />
+        </div>
+        <div class="wallpaper-overlay">
+          <div class="wallpaper-name">Grainy Gradients</div>
+          <div class="wallpaper-meta">Premium Wallpaper Pack</div>
+        </div>
+      </a>
+
+      <a href="wallpapers.html" class="wallpaper-card mobile-hidden">
+        <div class="wallpaper-thumb">
+          <img src="https://i.ibb.co/fGygGyMQ/019-B15-B6-3-A7-A-70-F0-A9-ED-87768-B3-DEF9-C.jpg" alt="Liquid Dots" />
+        </div>
+        <div class="wallpaper-overlay">
+          <div class="wallpaper-name">Liquid Dots</div>
+          <div class="wallpaper-meta">Premium Wallpaper Pack</div>
+        </div>
+      </a>
+
+    </div>
+  </section>
+
+  <!-- CORE -->
+  <section id="core">
+    <div class="section-header">
+      <h2 class="section-title">Заметки</h2>
+      <a href="core.html" class="section-link">Смотреть всё →</a>
+    </div>
+    <div class="core-row">
+
+      <a href="core.html" class="core-card">
+        <div class="core-card-thumb">
+          <img src="https://i.ibb.co/yng3WXN0/Picsew-20260220050233.avif" alt="iOS 26.4" />
+        </div>
+        <div class="core-card-body">
+          <div class="core-card-title">iOS 26.4</div>
+          <div class="core-card-desc">Перейти в Заметки →</div>
+        </div>
+      </a>
+
+      <a href="core.html" class="core-card">
+        <div class="core-card-thumb">
+          <img src="https://i.ibb.co/SLct2Sm/019c6450-2c84-740a-866d-41474a95cc41.jpg" alt="core.3" />
+        </div>
+        <div class="core-card-body">
+          <div class="core-card-title">core.3</div>
+          <div class="core-card-desc">Перейти в Заметки →</div>
+        </div>
+      </a>
+
+      <a href="core.html" class="core-card mobile-hidden">
+        <div class="core-card-thumb">
+          <img src="https://i.ibb.co/BHsHjCJD/IMG-8684.jpg" alt="core.2" />
+        </div>
+        <div class="core-card-body">
+          <div class="core-card-title">core.2</div>
+          <div class="core-card-desc">Перейти в Заметки →</div>
+        </div>
+      </a>
+
+      <a href="core.html" class="core-card mobile-hidden">
+        <div class="core-card-thumb">
+          <img src="https://i.ibb.co/XZYmwNTZ/019-C53-EF-4-EB0-7-DA8-B137-AC809-D82-CE86.jpg" alt="my apps in 2025" />
+        </div>
+        <div class="core-card-body">
+          <div class="core-card-title">my apps in 2025</div>
+          <div class="core-card-desc">Перейти в Заметки →</div>
+        </div>
+      </a>
+
+    </div>
+  </section>
+
+  <!-- WALLS -->
+  <section id="walls">
+    <div class="section-header">
+      <h2 class="section-title">Walls</h2>
+      <a href="walls.html" class="section-link">Смотреть всё →</a>
+    </div>
+    <div class="walls-row">
+
+      <a href="walls.html" class="walls-card">
+        <img src="https://i.ibb.co/KprCvfkw/Picsew-20260220181012.avif" alt="" />
+      </a>
+
+      <a href="walls.html" class="walls-card">
+        <img src="https://i.ibb.co/J6ZT0v1/Picsew-20260220181015.avif" alt="" />
+      </a>
+
+      <a href="walls.html" class="walls-card mobile-hidden">
+        <img src="https://i.ibb.co/hRvxJnDk/Picsew-20260220181009.avif" alt="" />
+      </a>
+
+      <a href="walls.html" class="walls-card mobile-hidden">
+        <img src="https://i.ibb.co/LzJndbQW/Picsew-20260220171929.avif" alt="" />
+      </a>
+
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-copy">Made with ❤️ by Alex.Chuck</div>
+  </footer>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Dropdown click
+      var dropdownToggle = document.querySelector('.nav-dropdown-toggle');
+      var dropdown = document.querySelector('.nav-dropdown');
+      if (dropdownToggle && dropdown) {
+        dropdownToggle.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          dropdown.classList.toggle('open');
+        });
+        document.addEventListener('click', function() {
+          dropdown.classList.remove('open');
+        });
+      }
+      var btn = document.getElementById('burgerBtn');
+      var drawer = document.getElementById('drawer');
+      var overlay = document.getElementById('drawerOverlay');
+
+      function openMenu() {
+        btn.classList.add('open');
+        drawer.classList.add('open');
+        overlay.classList.add('visible');
+      }
+
+      function closeMenu() {
+        btn.classList.remove('open');
+        drawer.classList.remove('open');
+        overlay.classList.remove('visible');
+      }
+
+      function toggleMenu(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        drawer.classList.contains('open') ? closeMenu() : openMenu();
+      }
+
+      btn.addEventListener('click', toggleMenu);
+      btn.addEventListener('touchstart', toggleMenu, { passive: false });
+
+      overlay.addEventListener('click', closeMenu);
+      overlay.addEventListener('touchstart', function(e) {
+        e.preventDefault();
+        closeMenu();
+      }, { passive: false });
+
+      document.querySelectorAll('.drawer-links a').forEach(function(link) {
+        link.addEventListener('click', closeMenu);
+      });
+      // Drawer accordion
+      var accBtn = document.getElementById('drawerWallBtn');
+      var accItem = accBtn ? accBtn.closest('.drawer-accordion') : null;
+      if (accBtn && accItem) {
+        accBtn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          accItem.classList.toggle('open');
+        });
+      }
+    });
+  </script>
+
+</body>
+</html>

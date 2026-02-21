@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Walls — NuviraByteCore</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --black: #0a0a0a;
+      --white: #fafafa;
+      --accent: #c8f060;
+      --gray: #e8e8e8;
+      --mid: #888;
+      --transition: 0.22s ease;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', sans-serif;
+      background: var(--white);
+      color: var(--black);
+      font-size: 15px;
+      line-height: 1.6;
+    }
+
+    /* NAV */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      background: var(--white);
+      border-bottom: 1px solid var(--gray);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 48px; height: 60px;
+    }
+    .nav-logo { display: flex; flex-direction: column; font-weight: 800; font-size: 20px; letter-spacing: -0.5px; text-decoration: none; color: var(--black); }
+    .nav-logo-sub { display: block; font-size: 10px; font-weight: 400; letter-spacing: 0.04em; color: var(--mid); line-height: 1.2; }
+    .nav-links { display: flex; gap: 36px; list-style: none; }
+    .nav-links a { text-decoration: none; color: var(--black); font-size: 14px; font-weight: 500; letter-spacing: 0.02em; transition: color var(--transition); }
+    .nav-links a:hover { color: var(--mid); }
+
+    .burger { display: none; flex-direction: column; justify-content: center; gap: 5px; background: none; border: none; cursor: pointer; padding: 4px; width: 36px; height: 36px; }
+    .burger span { display: block; width: 22px; height: 2px; background: var(--black); border-radius: 2px; transition: transform 0.25s ease, opacity 0.25s ease; transform-origin: center; }
+    .burger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .burger.open span:nth-child(2) { opacity: 0; }
+    .burger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+    .drawer-overlay { position: fixed; inset: 0; z-index: 300; background: rgba(0,0,0,0.25); opacity: 0; pointer-events: none; transition: opacity 0.25s ease; }
+    .drawer-overlay.visible { opacity: 1; pointer-events: all; }
+    .drawer { position: fixed; top: 60px; right: 0; z-index: 400; background: var(--white); border-left: 1px solid var(--gray); border-bottom: 1px solid var(--gray); border-radius: 0 0 0 12px; min-width: 200px; padding: 8px 0; transform: translateX(110%); transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94); box-shadow: -4px 4px 24px rgba(0,0,0,0.08); }
+    .drawer.open { transform: translateX(0); }
+    .drawer-links { list-style: none; }
+    .drawer-links a { display: block; padding: 13px 24px; text-decoration: none; color: var(--black); font-size: 15px; font-weight: 500; transition: background var(--transition); }
+    .drawer-links a:hover { background: var(--gray); }
+    .drawer-accordion { list-style: none; }
+    .drawer-accordion-btn {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      padding: 13px 24px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--black);
+      text-align: left;
+      transition: background var(--transition);
+    }
+    .drawer-accordion-btn:hover { background: var(--gray); }
+    .drawer-acc-arrow {
+      font-size: 14px;
+      color: var(--mid);
+      transition: transform 0.25s ease;
+      display: inline-block;
+    }
+    .drawer-accordion.open .drawer-acc-arrow { transform: rotate(90deg); }
+    .drawer-accordion-sub {
+      list-style: none;
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      background: var(--gray);
+    }
+    .drawer-accordion.open .drawer-accordion-sub { max-height: 120px; }
+    .drawer-accordion-sub li a {
+      display: block;
+      padding: 11px 24px 11px 36px;
+      text-decoration: none;
+      color: #444;
+      font-size: 14px;
+      font-weight: 500;
+      transition: background var(--transition);
+    }
+    .drawer-accordion-sub li a:hover { background: #ddd; }
+
+    /* PAGE HEADER */
+    .page-header {
+      padding: 48px 48px 32px;
+      max-width: 1200px;
+      margin: 0 auto;
+      border-bottom: 1px solid var(--gray);
+      margin-bottom: 40px;
+    }
+    .page-header h1 { font-size: clamp(32px, 4vw, 52px); font-weight: 800; letter-spacing: -1.5px; line-height: 1.1; margin-bottom: 8px; }
+    .page-header p { color: var(--mid); font-size: 15px; }
+
+    /* GRID */
+    .masonry-wrapper {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 48px 80px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+
+    .masonry-item {
+      border-radius: 12px;
+      overflow: hidden;
+      background: var(--gray);
+      transition: box-shadow 0.3s ease;
+    }
+
+    .masonry-item img {
+      width: 100%;
+      height: auto;
+      display: block;
+      transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .masonry-item:hover {
+      box-shadow: 0 16px 48px rgba(0,0,0,0.14);
+    }
+
+    .masonry-item:hover img {
+      transform: scale(1.03);
+    }
+
+    /* FOOTER */
+    footer { border-top: 1px solid var(--gray); padding: 28px 48px; display: flex; justify-content: center; }
+    .footer-copy { font-size: 14px; color: var(--mid); }
+
+    @media (max-width: 900px) {
+      nav { padding: 0 20px; }
+      .nav-links { display: none !important; }
+      .burger { display: flex; }
+      .page-header { padding: 32px 20px 24px; max-width: 100%; }
+      .masonry-wrapper { grid-template-columns: repeat(2, 1fr); padding: 0 20px 60px; }
+      footer { padding: 24px 20px; }
+    }
+
+    /* ── DROPDOWN ── */
+    .nav-dropdown { position: relative; }
+    .nav-dropdown-toggle { display: inline-flex; align-items: center; gap: 4px; cursor: pointer; vertical-align: middle; }
+    .nav-arrow { font-size: 12px; color: var(--mid); transition: transform 0.2s ease; display: inline-block; }
+    .nav-dropdown.open .nav-arrow { transform: rotate(90deg); }
+    .nav-submenu {
+      position: absolute;
+      top: calc(100% + 12px);
+      left: 50%;
+      transform: translateX(-50%) translateY(-6px);
+      background: var(--white);
+      border: 1px solid var(--gray);
+      border-radius: 10px;
+      padding: 6px 0;
+      list-style: none;
+      min-width: 180px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.09);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.18s ease, transform 0.18s ease;
+    }
+    .nav-dropdown.open .nav-submenu {
+      opacity: 1;
+      pointer-events: all;
+      transform: translateX(-50%) translateY(0);
+    }
+    .nav-submenu li a {
+      display: block;
+      padding: 10px 18px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--black);
+      text-decoration: none;
+      white-space: nowrap;
+      transition: background 0.15s ease;
+    }
+    .nav-submenu li a:hover { background: var(--gray); color: var(--black) !important; }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <a href="index.html" class="nav-logo">
+      NuviraByteCore
+      <span class="nav-logo-sub">powered by Alex.Chuck</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="index.html">Главная</a></li>
+      <li><a href="core.html">Заметки</a></li>
+      <li class="nav-dropdown">
+        <a href="wallpapers.html" class="nav-dropdown-toggle">Обои <span class="nav-arrow">›</span></a>
+        <ul class="nav-submenu">
+          <li><a href="wallpapers.html">Premium Wallpapers</a></li>
+          <li><a href="walls.html">Walls</a></li>
+        </ul>
+      </li>
+      <li><a href="about.html">О NBC</a></li>
+    </ul>
+    <button class="burger" id="burgerBtn" aria-label="Меню">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+
+  <div class="drawer-overlay" id="drawerOverlay"></div>
+  <div class="drawer" id="drawer">
+    <ul class="drawer-links">
+      <li><a href="index.html">Главная</a></li>
+      <li><a href="core.html">Заметки</a></li>
+      <li class="drawer-accordion">
+        <button class="drawer-accordion-btn" id="drawerWallBtn">
+          Обои <span class="drawer-acc-arrow">›</span>
+        </button>
+        <ul class="drawer-accordion-sub" id="drawerWallSub">
+          <li><a href="wallpapers.html">Premium Wallpapers</a></li>
+          <li><a href="walls.html">Walls</a></li>
+        </ul>
+      </li>
+      <li><a href="about.html">О NBC</a></li>
+    </ul>
+  </div>
+
+  <div class="page-header">
+    <h1>Walls</h1>
+    <p>Доступны для подписчиков <a href="about.html" style="color: var(--black); font-weight: 600; text-decoration: underline; text-underline-offset: 3px;">NuviraByteCore</a></p>
+  </div>
+
+  <div class="masonry-wrapper">
+    <div class="masonry-item"><img src="https://i.ibb.co/KprCvfkw/Picsew-20260220181012.avif" alt="" /></div>
+    <div class="masonry-item"><img src="https://i.ibb.co/J6ZT0v1/Picsew-20260220181015.avif" alt="" /></div>
+    <div class="masonry-item"><img src="https://i.ibb.co/hRvxJnDk/Picsew-20260220181009.avif" alt="" /></div>
+    <div class="masonry-item"><img src="https://i.ibb.co/LzJndbQW/Picsew-20260220171929.avif" alt="" /></div>
+    <div class="masonry-item"><img src="https://i.ibb.co/5JTB1hB/Picsew-20260220171939.avif" alt="" /></div>
+    <div class="masonry-item"><img src="https://i.ibb.co/5hM5YHyC/Picsew-20260220172014.avif" alt="" /></div>
+    <div class="masonry-item"><img src="https://i.ibb.co/3mTFjSsJ/Picsew-20260220171957.avif" alt="" /></div>
+    <div class="masonry-item"><img src="https://i.ibb.co/3yHtrF6z/Picsew-20260220171936.avif" alt="" /></div>
+    <div class="masonry-item"><img src="https://i.ibb.co/DfkhpR6m/Picsew-20260220171934.avif" alt="" /></div>
+    <div class="masonry-item"><img src="https://i.ibb.co/7xrfgkRb/Picsew-20260220171926.avif" alt="" /></div>
+    <div class="masonry-item"><img src="https://i.ibb.co/FkD33Ddb/Picsew-20260220171931.avif" alt="" /></div>
+    <div class="masonry-item"><img src="https://i.ibb.co/N2kvQDdj/Picsew-20260220171954.avif" alt="" /></div>
+    <div class="masonry-item"><img src="https://i.ibb.co/kVwrMgh2/Picsew-20260220172016.avif" alt="" /></div>
+    <div class="masonry-item"><img src="https://i.ibb.co/WW1M5ZjQ/Picsew-20260220171949.avif" alt="" /></div>
+    <div class="masonry-item"><img src="https://i.ibb.co/TBY97MPJ/Picsew-20260220171951.avif" alt="" /></div>
+    <div class="masonry-item"><img src="https://i.ibb.co/LXpW6hR3/Picsew-20260220172011.avif" alt="" /></div>
+    <div class="masonry-item"><img src="https://i.ibb.co/HTY0g9d2/Picsew-20260220171942.avif" alt="" /></div>
+    <div class="masonry-item"><img src="https://i.ibb.co/dsXqD0gZ/Picsew-20260220172008.avif" alt="" /></div>
+    <div class="masonry-item"><img src="https://i.ibb.co/qLM7k99z/Picsew-20260220172005.avif" alt="" /></div>
+    <div class="masonry-item"><img src="https://i.ibb.co/XkjCbk9t/Picsew-20260220171915.avif" alt="" /></div>
+    <div class="masonry-item"><img src="https://i.ibb.co/sv59VxBC/Picsew-20260220172003.avif" alt="" /></div>
+    <div class="masonry-item"><img src="https://i.ibb.co/mCcjKDmS/Picsew-20260220171912.avif" alt="" /></div>
+    <div class="masonry-item"><img src="https://i.ibb.co/r2WNr4nK/Picsew-20260220171924.avif" alt="" /></div>
+    <div class="masonry-item"><img src="https://i.ibb.co/Cp88XLYk/Picsew-20260220171921.avif" alt="" /></div>
+    <div class="masonry-item"><img src="https://i.ibb.co/PsZbHT32/Picsew-20260220171918.avif" alt="" /></div>
+  </div>
+
+  <footer>
+    <div class="footer-copy">Made with ❤️ by Alex.Chuck</div>
+  </footer>
+
+  <script>
+      // Burger menu
+    document.addEventListener('DOMContentLoaded', function() {
+      // Dropdown click
+      var dropdownToggle = document.querySelector('.nav-dropdown-toggle');
+      var dropdown = document.querySelector('.nav-dropdown');
+      if (dropdownToggle && dropdown) {
+        dropdownToggle.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          dropdown.classList.toggle('open');
+        });
+        document.addEventListener('click', function() {
+          dropdown.classList.remove('open');
+        });
+      }
+      var btn = document.getElementById('burgerBtn');
+      var drawer = document.getElementById('drawer');
+      var overlay = document.getElementById('drawerOverlay');
+      function openMenu() { btn.classList.add('open'); drawer.classList.add('open'); overlay.classList.add('visible'); }
+      function closeMenu() { btn.classList.remove('open'); drawer.classList.remove('open'); overlay.classList.remove('visible'); }
+      function toggleMenu(e) { e.preventDefault(); e.stopPropagation(); drawer.classList.contains('open') ? closeMenu() : openMenu(); }
+      btn.addEventListener('click', toggleMenu);
+      btn.addEventListener('touchstart', toggleMenu, { passive: false });
+      overlay.addEventListener('click', closeMenu);
+      overlay.addEventListener('touchstart', function(e) { e.preventDefault(); closeMenu(); }, { passive: false });
+      document.querySelectorAll('.drawer-links a').forEach(function(link) { link.addEventListener('click', closeMenu); });
+      // Drawer accordion
+      var accBtn = document.getElementById('drawerWallBtn');
+      var accItem = accBtn ? accBtn.closest('.drawer-accordion') : null;
+      if (accBtn && accItem) {
+        accBtn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          accItem.classList.toggle('open');
+        });
+      }
+    });
+  </script>
+
+</body>
+</html>

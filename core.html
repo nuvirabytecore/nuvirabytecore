@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Core — NuviraByteCore</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root { --black: #0a0a0a; --white: #fafafa; --accent: #c8f060; --gray: #e8e8e8; --mid: #888; --radius: 4px; --transition: 0.22s ease; }
+    html { scroll-behavior: smooth; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', sans-serif; background: var(--white); color: var(--black); font-size: 15px; line-height: 1.6; }
+
+    nav { position: sticky; top: 0; z-index: 100; background: var(--white); border-bottom: 1px solid var(--gray); display: flex; align-items: center; justify-content: space-between; padding: 0 48px; height: 60px; }
+    .nav-logo-sub { display: block; font-size: 10px; font-weight: 400; letter-spacing: 0.04em; color: var(--mid); line-height: 1.2; }
+
+    .nav-logo { display: flex; flex-direction: column; font-weight: 800; font-size: 20px; letter-spacing: -0.5px; text-decoration: none; color: var(--black); }
+    .nav-links { display: flex; gap: 36px; list-style: none; }
+    .nav-links a { text-decoration: none; color: var(--black); font-size: 14px; font-weight: 500; letter-spacing: 0.02em; transition: color var(--transition); }
+    .nav-links a:hover { color: var(--mid); }
+
+    .burger { display: none; flex-direction: column; justify-content: center; gap: 5px; background: none; border: none; cursor: pointer; padding: 4px; width: 36px; height: 36px; }
+    .burger span { display: block; width: 22px; height: 2px; background: var(--black); border-radius: 2px; transition: transform 0.25s ease, opacity 0.25s ease; transform-origin: center; }
+    .burger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .burger.open span:nth-child(2) { opacity: 0; }
+    .burger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+    .drawer-overlay { position: fixed; inset: 0; z-index: 300; background: rgba(0,0,0,0.25); opacity: 0; pointer-events: none; transition: opacity 0.25s ease; }
+    .drawer-overlay.visible { opacity: 1; pointer-events: all; }
+    .drawer { position: fixed; top: 60px; right: 0; z-index: 400; background: var(--white); border-left: 1px solid var(--gray); border-bottom: 1px solid var(--gray); border-radius: 0 0 0 12px; min-width: 200px; padding: 8px 0; transform: translateX(110%); transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94); box-shadow: -4px 4px 24px rgba(0,0,0,0.08); }
+    .drawer.open { transform: translateX(0); }
+    .drawer-links { list-style: none; }
+    .drawer-links a { display: block; padding: 13px 24px; text-decoration: none; color: var(--black); font-size: 15px; font-weight: 500; transition: background var(--transition); }
+    .drawer-links a:hover { background: var(--gray); }
+    .drawer-accordion { list-style: none; }
+    .drawer-accordion-btn {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      padding: 13px 24px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--black);
+      text-align: left;
+      transition: background var(--transition);
+    }
+    .drawer-accordion-btn:hover { background: var(--gray); }
+    .drawer-acc-arrow {
+      font-size: 14px;
+      color: var(--mid);
+      transition: transform 0.25s ease;
+      display: inline-block;
+    }
+    .drawer-accordion.open .drawer-acc-arrow { transform: rotate(90deg); }
+    .drawer-accordion-sub {
+      list-style: none;
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      background: var(--gray);
+    }
+    .drawer-accordion.open .drawer-accordion-sub { max-height: 120px; }
+    .drawer-accordion-sub li a {
+      display: block;
+      padding: 11px 24px 11px 36px;
+      text-decoration: none;
+      color: #444;
+      font-size: 14px;
+      font-weight: 500;
+      transition: background var(--transition);
+    }
+    .drawer-accordion-sub li a:hover { background: #ddd; }
+
+    .page-header { padding: 48px 48px 32px; max-width: 1200px; margin: 0 auto; border-bottom: 1px solid var(--gray); margin-bottom: 40px; }
+    .page-header h1 { font-size: clamp(32px, 4vw, 52px); font-weight: 800; letter-spacing: -1.5px; line-height: 1.1; margin-bottom: 8px; }
+    .page-header p { color: var(--mid); font-size: 15px; }
+    .page-header a { color: var(--black); font-weight: 600; text-decoration: underline; text-underline-offset: 3px; transition: opacity var(--transition); }
+    .page-header a:hover { opacity: 0.6; }
+
+    .grid-wrapper { max-width: 1200px; margin: 0 auto; padding: 0 48px 80px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; }
+    .core-card { border-radius: 12px; overflow: hidden; position: relative; text-decoration: none; display: block; background: var(--white); border: 1.5px solid var(--gray); transition: border-color var(--transition), transform var(--transition), box-shadow var(--transition); }
+    .core-card:hover { border-color: var(--black); transform: translateY(-3px); box-shadow: 0 12px 32px rgba(0,0,0,0.08); }
+    .core-card-thumb { overflow: hidden; background: var(--gray); position: relative; }
+    .core-card-thumb img { width: 100%; height: auto; display: block; transition: transform 0.4s ease; }
+    .core-card:hover .core-card-thumb img { transform: scale(1.03); }
+    .core-card-badge { position: absolute; top: 12px; right: 12px; background: var(--accent); color: var(--black); font-size: 10px; font-weight: 700; padding: 3px 10px; border-radius: 100px; letter-spacing: 0.06em; z-index: 2; }
+    .core-card-body { padding: 22px 24px 26px; }
+    .core-card-title { font-weight: 700; font-size: 18px; letter-spacing: -0.2px; margin-bottom: 10px; color: var(--black); }
+    .core-card-desc { font-size: 15px; color: #666; line-height: 1.7; }
+
+    footer { border-top: 1px solid var(--gray); padding: 28px 48px; display: flex; justify-content: center; }
+    .footer-copy { font-size: 14px; color: var(--mid); }
+
+    @media (max-width: 900px) {
+      nav { padding: 0 20px; }
+      .nav-links { display: none !important; }
+      .burger { display: flex; }
+      .page-header { padding: 32px 20px 24px; max-width: 100%; }
+      .grid-wrapper { grid-template-columns: 1fr; padding: 0 20px 60px; max-width: 100%; }
+      footer { padding: 24px 20px; }
+    }
+
+    /* ── DROPDOWN ── */
+    .nav-dropdown { position: relative; }
+    .nav-dropdown-toggle { display: inline-flex; align-items: center; gap: 4px; cursor: pointer; vertical-align: middle; }
+    .nav-arrow { font-size: 12px; color: var(--mid); transition: transform 0.2s ease; display: inline-block; }
+    .nav-dropdown.open .nav-arrow { transform: rotate(90deg); }
+    .nav-submenu {
+      position: absolute;
+      top: calc(100% + 12px);
+      left: 50%;
+      transform: translateX(-50%) translateY(-6px);
+      background: var(--white);
+      border: 1px solid var(--gray);
+      border-radius: 10px;
+      padding: 6px 0;
+      list-style: none;
+      min-width: 180px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.09);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.18s ease, transform 0.18s ease;
+    }
+    .nav-dropdown.open .nav-submenu {
+      opacity: 1;
+      pointer-events: all;
+      transform: translateX(-50%) translateY(0);
+    }
+    .nav-submenu li a {
+      display: block;
+      padding: 10px 18px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--black);
+      text-decoration: none;
+      white-space: nowrap;
+      transition: background 0.15s ease;
+    }
+    .nav-submenu li a:hover { background: var(--gray); color: var(--black) !important; }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <a href="index.html" class="nav-logo">
+      NuviraByteCore
+      <span class="nav-logo-sub">powered by Alex.Chuck</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="index.html">Главная</a></li>
+      <li><a href="core.html">Заметки</a></li>
+      <li class="nav-dropdown">
+        <a href="wallpapers.html" class="nav-dropdown-toggle">Обои <span class="nav-arrow">›</span></a>
+        <ul class="nav-submenu">
+          <li><a href="wallpapers.html">Premium Wallpapers</a></li>
+          <li><a href="walls.html">Walls</a></li>
+        </ul>
+      </li>
+      <li><a href="about.html">О NBC</a></li>
+    </ul>
+    <button class="burger" id="burgerBtn" aria-label="Меню">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+
+  <div class="drawer-overlay" id="drawerOverlay"></div>
+  <div class="drawer" id="drawer">
+    <ul class="drawer-links">
+      <li><a href="index.html">Главная</a></li>
+      <li><a href="core.html">Заметки</a></li>
+      <li class="drawer-accordion">
+        <button class="drawer-accordion-btn" id="drawerWallBtn">
+          Обои <span class="drawer-acc-arrow">›</span>
+        </button>
+        <ul class="drawer-accordion-sub" id="drawerWallSub">
+          <li><a href="wallpapers.html">Premium Wallpapers</a></li>
+          <li><a href="walls.html">Walls</a></li>
+        </ul>
+      </li>
+      <li><a href="about.html">О NBC</a></li>
+    </ul>
+  </div>
+
+  <div class="page-header">
+    <h1>Заметки</h1>
+    <p>Доступны для подписчиков <a href="about.html">NuviraByteCore</a></p>
+  </div>
+
+  <div class="grid-wrapper">
+
+    <a href="posts/ios264.html" class="core-card">
+      <div class="core-card-thumb">
+        <img src="https://i.ibb.co/yng3WXN0/Picsew-20260220050233.avif" alt="iOS 26.4" />
+      </div>
+      <div class="core-card-body">
+        <div class="core-card-title">iOS 26.4</div>
+        <div class="core-card-desc">Список изменений</div>
+      </div>
+    </a>
+
+    <a href="https://t.me/c/3141296532/355" target="_blank" class="core-card">
+      <div class="core-card-thumb">
+        <img src="https://i.ibb.co/SLct2Sm/019c6450-2c84-740a-866d-41474a95cc41.jpg" alt="core.3" />
+      </div>
+      <div class="core-card-body">
+        <div class="core-card-title">core.3</div>
+        <div class="core-card-desc">В новом выпуске — минималистичная RAW-камера, трекер цен в App Store, загрузчик для macOS и способ установки прог на iOS без сертификата разработчика. Отдельно, короткие заметки: о найденных случайных обоев котят, об Ado, о миленькой проге для трансляций Lo-Fi станций на macOS, о скором выходе нового аниме которое затрагивает рутину взрослых, о точечном контроле звука на macOS, и, как мысль начать читать книги привела к желанию покупки нового устройства.</div>
+      </div>
+    </a>
+
+    <a href="https://t.me/c/3141296532/226" target="_blank" class="core-card">
+      <div class="core-card-thumb">
+        <img src="https://i.ibb.co/BHsHjCJD/IMG-8684.jpg" alt="core.2" />
+      </div>
+      <div class="core-card-body">
+        <div class="core-card-title">core.2</div>
+        <div class="core-card-desc">В новом core — заметки о том, что зацепило меня в последнее время. Несколько приложений: загрузчик видео из соцсетей в один клик, камера без обработки алгоритмов Apple, приложение для сохранения видео с YouTube для просмотра на потом, трекер книг и минималистичный дневник, чтобы фиксировать главное за день.<br><br>Дополнительно — мысли о возвращении со Spotify на Apple Music, премьере второго сезона одного из моих любимых аниме и ещё пара интересных находок.</div>
+      </div>
+    </a>
+
+    <a href="https://t.me/c/3141296532/174" target="_blank" class="core-card">
+      <div class="core-card-thumb">
+        <img src="https://i.ibb.co/XZYmwNTZ/019-C53-EF-4-EB0-7-DA8-B137-AC809-D82-CE86.jpg" alt="my apps in 2025" />
+      </div>
+      <div class="core-card-body">
+        <div class="core-card-title">my apps in 2025</div>
+        <div class="core-card-desc">Мои приложения на конец 2025 года</div>
+      </div>
+    </a>
+
+    <a href="https://t.me/c/3141296532/164" target="_blank" class="core-card">
+      <div class="core-card-thumb">
+        <img src="https://i.ibb.co/PGn699zD/IMG-8685.jpg" alt="legacy-core.01-03" />
+      </div>
+      <div class="core-card-body">
+        <div class="core-card-title">legacy-core.01-03</div>
+        <div class="core-card-desc">Восстановленные записи: note.1 - note.8<br><br>Раньше заметки выходили под названием note, теперь это core. Старые тексты будут восстанавливаться с редактурой оставляя актуальное. В этих трех записках 8 note из 25.</div>
+      </div>
+    </a>
+
+    <a href="https://t.me/c/3141296532/163" target="_blank" class="core-card">
+      <div class="core-card-thumb">
+        <img src="https://i.ibb.co/HmKJHW2/IMG-8683.jpg" alt="core.1" />
+      </div>
+      <div class="core-card-body">
+        <div class="core-card-title">core.1</div>
+        <div class="core-card-desc">В этом выпуске — небольшое эссе о режиме энергосбережения в iPhone и приложения, которые стали частью повседневного использования: сервис для создания личной ленты без алгоритмов, минималистичный заметочник, лучшее радио-приложение, универсальный трекер, калькулятор сна и игра, которая отлично помогает скоротать время.</div>
+      </div>
+    </a>
+
+  </div>
+
+  <footer>
+    <div class="footer-copy">Made with ❤️ by Alex.Chuck</div>
+  </footer>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Dropdown click
+      var dropdownToggle = document.querySelector('.nav-dropdown-toggle');
+      var dropdown = document.querySelector('.nav-dropdown');
+      if (dropdownToggle && dropdown) {
+        dropdownToggle.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          dropdown.classList.toggle('open');
+        });
+        document.addEventListener('click', function() {
+          dropdown.classList.remove('open');
+        });
+      }
+      var btn = document.getElementById('burgerBtn');
+      var drawer = document.getElementById('drawer');
+      var overlay = document.getElementById('drawerOverlay');
+      function openMenu() { btn.classList.add('open'); drawer.classList.add('open'); overlay.classList.add('visible'); }
+      function closeMenu() { btn.classList.remove('open'); drawer.classList.remove('open'); overlay.classList.remove('visible'); }
+      function toggleMenu(e) { e.preventDefault(); e.stopPropagation(); drawer.classList.contains('open') ? closeMenu() : openMenu(); }
+      btn.addEventListener('click', toggleMenu);
+      btn.addEventListener('touchstart', toggleMenu, { passive: false });
+      overlay.addEventListener('click', closeMenu);
+      overlay.addEventListener('touchstart', function(e) { e.preventDefault(); closeMenu(); }, { passive: false });
+      document.querySelectorAll('.drawer-links a').forEach(function(link) { link.addEventListener('click', closeMenu); });
+      // Drawer accordion
+      var accBtn = document.getElementById('drawerWallBtn');
+      var accItem = accBtn ? accBtn.closest('.drawer-accordion') : null;
+      if (accBtn && accItem) {
+        accBtn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          accItem.classList.toggle('open');
+        });
+      }
+    });
+  </script>
+
+</body>
+</html>

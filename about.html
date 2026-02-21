@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>О NBC — NuviraByteCore</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --black: #0a0a0a;
+      --white: #fafafa;
+      --accent: #c8f060;
+      --gray: #e8e8e8;
+      --mid: #888;
+      --radius: 4px;
+      --transition: 0.22s ease;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', sans-serif;
+      background: var(--white);
+      color: var(--black);
+      font-size: 15px;
+      line-height: 1.6;
+    }
+
+    /* NAV */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--white);
+      border-bottom: 1px solid var(--gray);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 48px;
+      height: 60px;
+    }
+
+    .nav-logo-sub { display: block; font-size: 10px; font-weight: 400; letter-spacing: 0.04em; color: var(--mid); line-height: 1.2; }
+
+    .nav-logo {
+      font-weight: 800;
+      font-size: 20px;
+      letter-spacing: -0.5px;
+      text-decoration: none;
+      color: var(--black);
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 36px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      text-decoration: none;
+      color: var(--black);
+      font-size: 14px;
+      font-weight: 500;
+      letter-spacing: 0.02em;
+      transition: color var(--transition);
+    }
+
+    .nav-links a:hover { color: var(--mid); }
+
+    /* BURGER */
+    .burger {
+      display: none;
+      flex-direction: column;
+      justify-content: center;
+      gap: 5px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 4px;
+      width: 36px;
+      height: 36px;
+    }
+
+    .burger span {
+      display: block;
+      width: 22px;
+      height: 2px;
+      background: var(--black);
+      border-radius: 2px;
+      transition: transform 0.25s ease, opacity 0.25s ease;
+      transform-origin: center;
+    }
+
+    .burger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .burger.open span:nth-child(2) { opacity: 0; }
+    .burger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+    .drawer-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 300;
+      background: rgba(0,0,0,0.25);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+    }
+
+    .drawer-overlay.visible { opacity: 1; pointer-events: all; }
+
+    .drawer {
+      position: fixed;
+      top: 60px;
+      right: 0;
+      z-index: 400;
+      background: var(--white);
+      border-left: 1px solid var(--gray);
+      border-bottom: 1px solid var(--gray);
+      border-radius: 0 0 0 12px;
+      min-width: 200px;
+      padding: 8px 0;
+      transform: translateX(110%);
+      transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      box-shadow: -4px 4px 24px rgba(0,0,0,0.08);
+    }
+
+    .drawer.open { transform: translateX(0); }
+
+    .drawer-links { list-style: none; }
+
+    .drawer-links a {
+      display: block;
+      padding: 13px 24px;
+      text-decoration: none;
+      color: var(--black);
+      font-size: 15px;
+      font-weight: 500;
+      transition: background var(--transition);
+    }
+
+    .drawer-links a:hover { background: var(--gray); }
+    .drawer-accordion { list-style: none; }
+    .drawer-accordion-btn {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      padding: 13px 24px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--black);
+      text-align: left;
+      transition: background var(--transition);
+    }
+    .drawer-accordion-btn:hover { background: var(--gray); }
+    .drawer-acc-arrow {
+      font-size: 14px;
+      color: var(--mid);
+      transition: transform 0.25s ease;
+      display: inline-block;
+    }
+    .drawer-accordion.open .drawer-acc-arrow { transform: rotate(90deg); }
+    .drawer-accordion-sub {
+      list-style: none;
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      background: var(--gray);
+    }
+    .drawer-accordion.open .drawer-accordion-sub { max-height: 120px; }
+    .drawer-accordion-sub li a {
+      display: block;
+      padding: 11px 24px 11px 36px;
+      text-decoration: none;
+      color: #444;
+      font-size: 14px;
+      font-weight: 500;
+      transition: background var(--transition);
+    }
+    .drawer-accordion-sub li a:hover { background: #ddd; }
+
+    /* PAGE HEADER */
+    .page-header {
+      padding: 56px 48px 40px;
+      max-width: 760px;
+      margin: 0 auto;
+    }
+
+    .page-tag {
+      display: inline-block;
+      background: var(--accent);
+      color: var(--black);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 4px 12px;
+      border-radius: 100px;
+      margin-bottom: 20px;
+    }
+
+    .page-header h1 {
+      font-size: clamp(36px, 5vw, 56px);
+      font-weight: 800;
+      letter-spacing: -1.5px;
+      line-height: 1.08;
+      margin-bottom: 12px;
+    }
+
+    .page-header p {
+      color: var(--mid);
+      font-size: 15px;
+    }
+
+    /* FAQ */
+    .faq-wrapper {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 0 48px 100px;
+    }
+
+    .faq-item {
+      border-top: 1px solid var(--gray);
+      padding: 28px 0;
+      opacity: 0;
+      transform: translateY(16px);
+      animation: fadeUp 0.4s ease both;
+    }
+
+    .faq-item:last-child {
+      border-bottom: 1px solid var(--gray);
+    }
+
+    @keyframes fadeUp {
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .faq-item:nth-child(1) { animation-delay: 0.05s; }
+    .faq-item:nth-child(2) { animation-delay: 0.10s; }
+    .faq-item:nth-child(3) { animation-delay: 0.15s; }
+    .faq-item:nth-child(4) { animation-delay: 0.20s; }
+    .faq-item:nth-child(5) { animation-delay: 0.25s; }
+
+    .faq-q {
+      font-size: 17px;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+      margin-bottom: 12px;
+      color: var(--black);
+    }
+
+    .faq-a {
+      color: #555;
+      font-size: 15px;
+      line-height: 1.75;
+    }
+
+    .faq-a p { margin-bottom: 10px; }
+    .faq-a p:last-child { margin-bottom: 0; }
+
+    .faq-a a {
+      color: var(--black);
+      font-weight: 600;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+      transition: opacity var(--transition);
+    }
+
+    .faq-a a:hover { opacity: 0.55; }
+
+    /* steps list */
+    .faq-steps {
+      list-style: none;
+      margin-top: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .faq-steps li {
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+      font-size: 15px;
+      color: #555;
+      line-height: 1.6;
+    }
+
+    .faq-steps li .step-num {
+      background: var(--black);
+      color: var(--white);
+      font-size: 11px;
+      font-weight: 700;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    /* tag pills */
+    .faq-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .faq-tag {
+      background: var(--gray);
+      color: var(--black);
+      font-size: 12px;
+      font-weight: 600;
+      padding: 5px 12px;
+      border-radius: 100px;
+      letter-spacing: 0.01em;
+    }
+
+    /* FOOTER */
+    footer {
+      border-top: 1px solid var(--gray);
+      padding: 28px 48px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .footer-copy { font-size: 14px; color: var(--mid); }
+
+    @media (max-width: 900px) {
+      nav { padding: 0 20px; }
+      .nav-links { display: none !important; }
+      .burger { display: flex; }
+      .page-header { padding: 32px 20px 24px; max-width: 100%; }
+      .faq-wrapper { padding: 0 20px 60px; }
+      footer { padding: 24px 20px; }
+    }
+
+    /* ── DROPDOWN ── */
+    .nav-dropdown { position: relative; }
+    .nav-dropdown-toggle { display: inline-flex; align-items: center; gap: 4px; cursor: pointer; vertical-align: middle; }
+    .nav-arrow { font-size: 12px; color: var(--mid); transition: transform 0.2s ease; display: inline-block; }
+    .nav-dropdown.open .nav-arrow { transform: rotate(90deg); }
+    .nav-submenu {
+      position: absolute;
+      top: calc(100% + 12px);
+      left: 50%;
+      transform: translateX(-50%) translateY(-6px);
+      background: var(--white);
+      border: 1px solid var(--gray);
+      border-radius: 10px;
+      padding: 6px 0;
+      list-style: none;
+      min-width: 180px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.09);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.18s ease, transform 0.18s ease;
+    }
+    .nav-dropdown.open .nav-submenu {
+      opacity: 1;
+      pointer-events: all;
+      transform: translateX(-50%) translateY(0);
+    }
+    .nav-submenu li a {
+      display: block;
+      padding: 10px 18px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--black);
+      text-decoration: none;
+      white-space: nowrap;
+      transition: background 0.15s ease;
+    }
+    .nav-submenu li a:hover { background: var(--gray); color: var(--black) !important; }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <a href="index.html" class="nav-logo">
+      NuviraByteCore
+      <span class="nav-logo-sub">powered by Alex.Chuck</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="index.html">Главная</a></li>
+      <li><a href="core.html">Заметки</a></li>
+      <li class="nav-dropdown">
+        <a href="wallpapers.html" class="nav-dropdown-toggle">Обои <span class="nav-arrow">›</span></a>
+        <ul class="nav-submenu">
+          <li><a href="wallpapers.html">Premium Wallpapers</a></li>
+          <li><a href="walls.html">Walls</a></li>
+        </ul>
+      </li>
+      <li><a href="about.html">О NBC</a></li>
+    </ul>
+    <button class="burger" id="burgerBtn" aria-label="Меню">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+
+  <!-- DRAWER -->
+  <div class="drawer-overlay" id="drawerOverlay"></div>
+  <div class="drawer" id="drawer">
+    <ul class="drawer-links">
+      <li><a href="index.html">Главная</a></li>
+      <li><a href="core.html">Заметки</a></li>
+      <li class="drawer-accordion">
+        <button class="drawer-accordion-btn" id="drawerWallBtn">
+          Обои <span class="drawer-acc-arrow">›</span>
+        </button>
+        <ul class="drawer-accordion-sub" id="drawerWallSub">
+          <li><a href="wallpapers.html">Premium Wallpapers</a></li>
+          <li><a href="walls.html">Walls</a></li>
+        </ul>
+      </li>
+      <li><a href="about.html">О NBC</a></li>
+    </ul>
+  </div>
+
+  <!-- PAGE HEADER -->
+  <div class="page-header">
+    <h1>О NBC</h1>
+    <p>FAQ</p>
+  </div>
+
+  <!-- FAQ -->
+  <div class="faq-wrapper">
+
+    <div class="faq-item">
+      <div class="faq-q">Что такое NuviraByteCore?</div>
+      <div class="faq-a">
+        <p>Это способ получить доступ к дополнительному контенту, который дополняет <a href="https://t.me/alex_chuck_x" target="_blank">Alex.Chuck</a>.</p>
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q">Что предлагает NuviraByteCore?</div>
+      <div class="faq-a">
+        <p>За 10$ вы получаете доступ к приватному каналу на месяц, в котором есть:</p>
+        <p style="margin-top: 14px;"><strong style="color: var(--black);">Core</strong> — заметки, в которых я делюсь приложениями, сервисами и интересными статьями или идеями, которые меня чем-то зацепили.</p>
+        <p><strong style="color: var(--black);">Premium Wallpapers and Walls</strong> — случайные обои, которые показались мне интересными и обычно доступны по подписке в различных сервисах, а также целые паки с обоями из сети, которые покупать по отдельности было бы слишком дорого. По сути, это что-то вроде торрента, где всё собрано в одном месте.</p>
+        <p><strong style="color: var(--black);">Discounts and Free Downloads</strong> — время от времени приложения получают скидки или вовсе раздаются бесплатно. Если на глаза попадется что-то действительно интересное, вы узнаете об этом.</p>
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q">Как вступить в канал?</div>
+      <div class="faq-a">
+        <p>Вступить в канал можно через бота.</p>
+        <ol class="faq-steps">
+          <li><span class="step-num">1</span><span>Открыть бота <a href="https://t.me/NuviraByteCore_bot" target="_blank">NuviraByteCore</a>.</span></li>
+          <li><span class="step-num">2</span><span>Нажать <strong style="color: var(--black);">Подписаться</strong>.</span></li>
+          <li><span class="step-num">3</span><span>Нажать кнопку <strong style="color: var(--black);">Оплатить</strong>.</span></li>
+          <li><span class="step-num">4</span><span>Выбрать способ оплаты.</span></li>
+          <li><span class="step-num">5</span><span>После оплаты нажать <strong style="color: var(--black);">Я оплатил</strong>.</span></li>
+          <li><span class="step-num">6</span><span>Готово. Вы прекрасны 🦫</span></li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q">Как отменить подписку?</div>
+      <div class="faq-a">
+        <p>Подписка уже отменена, поэтому ничего отменять не нужно. Вы платите единоразово за доступ к каналу на один месяц, поэтому автоматических списаний не будет.</p>
+        <p>Когда до окончания подписки останется один день, вы получите сообщение от бота о том, что подписка скоро истечёт, и при желании сможете продлить её.</p>
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q">У меня возникла проблема, как связаться с поддержкой?</div>
+      <div class="faq-a">
+        <p>Написать в <a href="https://t.me/NuviraSupport_bot" target="_blank">NuviraSupport</a>.</p>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-copy">Made with ❤️ by Alex.Chuck</div>
+  </footer>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Dropdown click
+      var dropdownToggle = document.querySelector('.nav-dropdown-toggle');
+      var dropdown = document.querySelector('.nav-dropdown');
+      if (dropdownToggle && dropdown) {
+        dropdownToggle.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          dropdown.classList.toggle('open');
+        });
+        document.addEventListener('click', function() {
+          dropdown.classList.remove('open');
+        });
+      }
+      var btn = document.getElementById('burgerBtn');
+      var drawer = document.getElementById('drawer');
+      var overlay = document.getElementById('drawerOverlay');
+
+      function openMenu() { btn.classList.add('open'); drawer.classList.add('open'); overlay.classList.add('visible'); }
+      function closeMenu() { btn.classList.remove('open'); drawer.classList.remove('open'); overlay.classList.remove('visible'); }
+      function toggleMenu(e) { e.preventDefault(); e.stopPropagation(); drawer.classList.contains('open') ? closeMenu() : openMenu(); }
+
+      btn.addEventListener('click', toggleMenu);
+      btn.addEventListener('touchstart', toggleMenu, { passive: false });
+      overlay.addEventListener('click', closeMenu);
+      overlay.addEventListener('touchstart', function(e) { e.preventDefault(); closeMenu(); }, { passive: false });
+      document.querySelectorAll('.drawer-links a').forEach(function(link) { link.addEventListener('click', closeMenu); });
+      // Drawer accordion
+      var accBtn = document.getElementById('drawerWallBtn');
+      var accItem = accBtn ? accBtn.closest('.drawer-accordion') : null;
+      if (accBtn && accItem) {
+        accBtn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          accItem.classList.toggle('open');
+        });
+      }
+    });
+  </script>
+
+</body>
+</html>
