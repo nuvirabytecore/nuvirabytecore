@@ -102,6 +102,22 @@
       footer { padding: 24px 20px; }
     }
 
+    /* ── PAGINATION ── */
+    .pagination { max-width: 1200px; margin: 0 auto; padding: 0 48px 64px; display: flex; align-items: center; justify-content: center; gap: 8px; }
+    .pagination button { background: none; border: none; cursor: pointer; font-family: inherit; font-size: 16px; color: var(--black); padding: 4px 8px; transition: color var(--transition); line-height: 1; }
+    .pagination button:hover { color: var(--mid); }
+    .pagination button:disabled { opacity: 0.2; cursor: default; pointer-events: none; }
+    .pagination .pg-center { display: flex; align-items: center; gap: 6px; padding: 0 8px; position: relative; }
+    .pagination .pg-current { font-size: 14px; font-weight: 600; color: var(--black); cursor: pointer; border-bottom: 1px solid var(--black); padding-bottom: 1px; transition: color var(--transition); user-select: none; }
+    .pagination .pg-current:hover { color: var(--mid); border-color: var(--mid); }
+    .pagination .pg-sep { font-size: 14px; color: var(--gray); }
+    .pagination .pg-total { font-size: 14px; font-weight: 500; color: var(--mid); }
+    .pg-dropdown { position: absolute; bottom: calc(100% + 10px); left: 50%; transform: translateX(-50%); background: var(--white); border: 1px solid var(--gray); border-radius: 10px; box-shadow: 0 8px 24px rgba(0,0,0,0.10); padding: 6px 0; min-width: 160px; max-height: calc(5 * 46px); overflow-y: auto; z-index: 200; }
+    .pg-dropdown button { display: block; width: 100%; text-align: center; padding: 12px 20px; font-size: 15px; font-weight: 500; color: var(--black); border-radius: 0; font-family: inherit; }
+    .pg-dropdown button:hover { background: var(--gray); color: var(--black); }
+    .pg-dropdown button.active { font-weight: 700; color: var(--black); background: var(--gray); }
+    @media (max-width: 900px) { .pagination { padding: 0 20px 48px; } }
+
     /* ── DROPDOWN ── */
     .nav-dropdown { position: relative; }
     .nav-dropdown-toggle { display: inline-flex; align-items: center; gap: 4px; cursor: pointer; vertical-align: middle; }
@@ -1332,12 +1348,127 @@
 
   </div>
 
+  <div class="pagination" id="pagination"></div>
+
   <footer>
     <div class="footer-copy">Made with ❤️ by Alex.Chuck</div>
   </footer>
 
   <script>
     document.addEventListener('DOMContentLoaded', function() {
+      // ── PAGINATION ──
+      var ITEMS_PER_PAGE = 10;
+      var currentPage = 1;
+      var grid = document.querySelector('.grid-wrapper');
+      var cards = Array.from(grid.children);
+      var totalPages = Math.ceil(cards.length / ITEMS_PER_PAGE);
+
+      function showPage(page) {
+        currentPage = page;
+        var start = (page - 1) * ITEMS_PER_PAGE;
+        var end = start + ITEMS_PER_PAGE;
+        cards.forEach(function(card, i) {
+          card.style.display = (i >= start && i < end) ? '' : 'none';
+        });
+        renderPagination();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+
+      var dropdownOpen = false;
+
+      function closeDropdown() {
+        var existing = document.querySelector('.pg-dropdown');
+        if (existing) existing.remove();
+        dropdownOpen = false;
+      }
+
+      function renderPagination() {
+        var container = document.getElementById('pagination');
+        container.innerHTML = '';
+        dropdownOpen = false;
+
+        // « первая
+        var first = document.createElement('button');
+        first.textContent = '«';
+        first.title = 'Первая страница';
+        first.disabled = currentPage === 1;
+        first.addEventListener('click', function() { showPage(1); });
+        container.appendChild(first);
+
+        // ← предыдущая
+        var prev = document.createElement('button');
+        prev.textContent = '←';
+        prev.disabled = currentPage === 1;
+        prev.addEventListener('click', function() { showPage(currentPage - 1); });
+        container.appendChild(prev);
+
+        // центр: [кликабельный номер] / total
+        var center = document.createElement('div');
+        center.className = 'pg-center';
+
+        var current = document.createElement('span');
+        current.className = 'pg-current';
+        current.textContent = currentPage;
+        current.addEventListener('click', function(e) {
+          e.stopPropagation();
+          var existing = document.querySelector('.pg-dropdown');
+          if (existing) { closeDropdown(); return; }
+          dropdownOpen = true;
+          var dropdown = document.createElement('div');
+          dropdown.className = 'pg-dropdown';
+          for (var i = 1; i <= totalPages; i++) {
+            (function(p) {
+              var btn = document.createElement('button');
+              btn.textContent = 'Страница ' + p;
+              if (p === currentPage) btn.classList.add('active');
+              btn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                closeDropdown();
+                showPage(p);
+              });
+              dropdown.appendChild(btn);
+            })(i);
+          }
+          center.appendChild(dropdown);
+          // скролл к активному пункту
+          setTimeout(function() {
+            var active = dropdown.querySelector('.active');
+            if (active) active.scrollIntoView({ block: 'nearest' });
+          }, 0);
+        });
+
+        var sep = document.createElement('span');
+        sep.className = 'pg-sep';
+        sep.textContent = '/';
+
+        var total = document.createElement('span');
+        total.className = 'pg-total';
+        total.textContent = totalPages;
+
+        center.appendChild(current);
+        center.appendChild(sep);
+        center.appendChild(total);
+        container.appendChild(center);
+
+        // → следующая
+        var next = document.createElement('button');
+        next.textContent = '→';
+        next.disabled = currentPage === totalPages;
+        next.addEventListener('click', function() { showPage(currentPage + 1); });
+        container.appendChild(next);
+
+        // » последняя
+        var last = document.createElement('button');
+        last.textContent = '»';
+        last.title = 'Последняя страница';
+        last.disabled = currentPage === totalPages;
+        last.addEventListener('click', function() { showPage(totalPages); });
+        container.appendChild(last);
+      }
+
+      document.addEventListener('click', closeDropdown);
+
+      showPage(1);
       // Dropdown click
       var dropdownToggle = document.querySelector('.nav-dropdown-toggle');
       var dropdown = document.querySelector('.nav-dropdown');
