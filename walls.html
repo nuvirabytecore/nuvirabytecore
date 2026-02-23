@@ -206,6 +206,50 @@
       transition: background 0.15s ease;
     }
     .nav-submenu li a:hover { background: var(--gray); color: var(--black) !important; }
+    /* ── LIGHTBOX (только мобиле) ── */
+    @media (max-width: 900px) {
+      .masonry-item { cursor: zoom-in; }
+      .lightbox-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        z-index: 1000;
+        background: rgba(0,0,0,0.92);
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+      }
+      .lightbox-overlay.active { display: flex; }
+      .lightbox-inner {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 20px;
+        max-width: 100%;
+      }
+      .lightbox-overlay img {
+        max-width: 100%;
+        max-height: 75vh;
+        border-radius: 10px;
+        object-fit: contain;
+        box-shadow: 0 24px 80px rgba(0,0,0,0.5);
+      }
+      .lightbox-close {
+        background: rgba(255,255,255,0.18);
+        border: none;
+        color: #fff;
+        font-size: 26px;
+        width: 52px;
+        height: 52px;
+        border-radius: 50%;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        line-height: 1;
+        flex-shrink: 0;
+      }
+    }
   </style>
 </head>
 <body>
@@ -285,6 +329,13 @@
 
   <div class="pagination" id="pagination"></div>
 
+  <div class="lightbox-overlay" id="lightboxOverlay">
+    <div class="lightbox-inner">
+      <img id="lightboxImg" src="" alt="" />
+      <button class="lightbox-close" id="lightboxClose">✕</button>
+    </div>
+  </div>
+
   <footer>
     <div class="footer-copy">Made with ❤️ by Alex.Chuck</div>
   </footer>
@@ -292,6 +343,32 @@
   <script>
       // Burger menu
     document.addEventListener('DOMContentLoaded', function() {
+      // ── LIGHTBOX (только мобиле) ──
+      var overlay = document.getElementById('lightboxOverlay');
+      var lightboxImg = document.getElementById('lightboxImg');
+      var closeBtn = document.getElementById('lightboxClose');
+
+      function openLightbox(src) {
+        lightboxImg.src = src;
+        overlay.classList.add('active');
+        document.body.style.overflow = 'hidden';
+      }
+      function closeLightbox() {
+        overlay.classList.remove('active');
+        lightboxImg.src = '';
+        document.body.style.overflow = '';
+      }
+
+      document.querySelectorAll('.masonry-item img').forEach(function(img) {
+        img.addEventListener('click', function() {
+          if (window.innerWidth <= 900) openLightbox(this.src);
+        });
+      });
+
+      overlay.addEventListener('click', function(e) {
+        if (e.target !== lightboxImg) closeLightbox();
+      });
+      closeBtn.addEventListener('click', closeLightbox);
       // ── PAGINATION ──
       var ITEMS_PER_PAGE = 12;
       var currentPage = 1;
@@ -414,14 +491,14 @@
       }
       var btn = document.getElementById('burgerBtn');
       var drawer = document.getElementById('drawer');
-      var overlay = document.getElementById('drawerOverlay');
-      function openMenu() { btn.classList.add('open'); drawer.classList.add('open'); overlay.classList.add('visible'); }
-      function closeMenu() { btn.classList.remove('open'); drawer.classList.remove('open'); overlay.classList.remove('visible'); }
+      var drawerOverlay = document.getElementById('drawerOverlay');
+      function openMenu() { btn.classList.add('open'); drawer.classList.add('open'); drawerOverlay.classList.add('visible'); }
+      function closeMenu() { btn.classList.remove('open'); drawer.classList.remove('open'); drawerOverlay.classList.remove('visible'); }
       function toggleMenu(e) { e.preventDefault(); e.stopPropagation(); drawer.classList.contains('open') ? closeMenu() : openMenu(); }
       btn.addEventListener('click', toggleMenu);
       btn.addEventListener('touchstart', toggleMenu, { passive: false });
-      overlay.addEventListener('click', closeMenu);
-      overlay.addEventListener('touchstart', function(e) { e.preventDefault(); closeMenu(); }, { passive: false });
+      drawerOverlay.addEventListener('click', closeMenu);
+      drawerOverlay.addEventListener('touchstart', function(e) { e.preventDefault(); closeMenu(); }, { passive: false });
       document.querySelectorAll('.drawer-links a').forEach(function(link) { link.addEventListener('click', closeMenu); });
       // Drawer accordion
       var accBtn = document.getElementById('drawerWallBtn');
