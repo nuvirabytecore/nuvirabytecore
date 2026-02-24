@@ -129,8 +129,10 @@
       width: 100%;
       height: auto;
       display: block;
-      transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+      transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.3s ease;
     }
+    .masonry-item img[data-src] { opacity: 0; }
+    .masonry-item img:not([data-src]) { opacity: 1; }
 
     .masonry-item:hover {
       box-shadow: 0 16px 48px rgba(0,0,0,0.14);
@@ -300,34 +302,34 @@
   </div>
 
   <div class="masonry-wrapper">
-    <div class="masonry-item"><img src="https://res.cloudinary.com/db0vbreih/image/upload/v1771862837/Picsew_20260223180617_uewrwj.heic" alt="" /></div>
-    <div class="masonry-item"><img src="https://res.cloudinary.com/db0vbreih/image/upload/v1771862836/Picsew_20260223180614_a0pwvi.heic" alt="" /></div>
-    <div class="masonry-item"><img src="https://res.cloudinary.com/db0vbreih/image/upload/v1771862837/Picsew_20260223180611_qoigoo.heic" alt="" /></div>
-    <div class="masonry-item"><img src="https://i.ibb.co/KprCvfkw/Picsew-20260220181012.avif" alt="" /></div>
-    <div class="masonry-item"><img src="https://i.ibb.co/J6ZT0v1/Picsew-20260220181015.avif" alt="" /></div>
-    <div class="masonry-item"><img src="https://i.ibb.co/hRvxJnDk/Picsew-20260220181009.avif" alt="" /></div>
-    <div class="masonry-item"><img src="https://i.ibb.co/LzJndbQW/Picsew-20260220171929.avif" alt="" /></div>
-    <div class="masonry-item"><img src="https://i.ibb.co/5JTB1hB/Picsew-20260220171939.avif" alt="" /></div>
-    <div class="masonry-item"><img src="https://i.ibb.co/5hM5YHyC/Picsew-20260220172014.avif" alt="" /></div>
-    <div class="masonry-item"><img src="https://i.ibb.co/3mTFjSsJ/Picsew-20260220171957.avif" alt="" /></div>
-    <div class="masonry-item"><img src="https://i.ibb.co/3yHtrF6z/Picsew-20260220171936.avif" alt="" /></div>
-    <div class="masonry-item"><img src="https://i.ibb.co/DfkhpR6m/Picsew-20260220171934.avif" alt="" /></div>
-    <div class="masonry-item"><img src="https://i.ibb.co/7xrfgkRb/Picsew-20260220171926.avif" alt="" /></div>
-    <div class="masonry-item"><img src="https://i.ibb.co/FkD33Ddb/Picsew-20260220171931.avif" alt="" /></div>
-    <div class="masonry-item"><img src="https://i.ibb.co/N2kvQDdj/Picsew-20260220171954.avif" alt="" /></div>
-    <div class="masonry-item"><img src="https://i.ibb.co/kVwrMgh2/Picsew-20260220172016.avif" alt="" /></div>
-    <div class="masonry-item"><img src="https://i.ibb.co/WW1M5ZjQ/Picsew-20260220171949.avif" alt="" /></div>
-    <div class="masonry-item"><img src="https://i.ibb.co/TBY97MPJ/Picsew-20260220171951.avif" alt="" /></div>
-    <div class="masonry-item"><img src="https://i.ibb.co/LXpW6hR3/Picsew-20260220172011.avif" alt="" /></div>
-    <div class="masonry-item"><img src="https://i.ibb.co/HTY0g9d2/Picsew-20260220171942.avif" alt="" /></div>
-    <div class="masonry-item"><img src="https://i.ibb.co/dsXqD0gZ/Picsew-20260220172008.avif" alt="" /></div>
-    <div class="masonry-item"><img src="https://i.ibb.co/qLM7k99z/Picsew-20260220172005.avif" alt="" /></div>
-    <div class="masonry-item"><img src="https://i.ibb.co/XkjCbk9t/Picsew-20260220171915.avif" alt="" /></div>
-    <div class="masonry-item"><img src="https://i.ibb.co/sv59VxBC/Picsew-20260220172003.avif" alt="" /></div>
-    <div class="masonry-item"><img src="https://i.ibb.co/mCcjKDmS/Picsew-20260220171912.avif" alt="" /></div>
-    <div class="masonry-item"><img src="https://i.ibb.co/r2WNr4nK/Picsew-20260220171924.avif" alt="" /></div>
-    <div class="masonry-item"><img src="https://i.ibb.co/Cp88XLYk/Picsew-20260220171921.avif" alt="" /></div>
-    <div class="masonry-item"><img src="https://i.ibb.co/PsZbHT32/Picsew-20260220171918.avif" alt="" /></div>
+    <div class="masonry-item"><img src="" data-src="https://res.cloudinary.com/db0vbreih/image/upload/v1771862837/Picsew_20260223180617_uewrwj.heic" alt="" /></div>
+    <div class="masonry-item"><img src="" data-src="https://res.cloudinary.com/db0vbreih/image/upload/v1771862836/Picsew_20260223180614_a0pwvi.heic" alt="" /></div>
+    <div class="masonry-item"><img src="" data-src="https://res.cloudinary.com/db0vbreih/image/upload/v1771862837/Picsew_20260223180611_qoigoo.heic" alt="" /></div>
+    <div class="masonry-item"><img src="" data-src="https://i.ibb.co/KprCvfkw/Picsew-20260220181012.avif" alt="" /></div>
+    <div class="masonry-item"><img src="" data-src="https://i.ibb.co/J6ZT0v1/Picsew-20260220181015.avif" alt="" /></div>
+    <div class="masonry-item"><img src="" data-src="https://i.ibb.co/hRvxJnDk/Picsew-20260220181009.avif" alt="" /></div>
+    <div class="masonry-item"><img src="" data-src="https://i.ibb.co/LzJndbQW/Picsew-20260220171929.avif" alt="" /></div>
+    <div class="masonry-item"><img src="" data-src="https://i.ibb.co/5JTB1hB/Picsew-20260220171939.avif" alt="" /></div>
+    <div class="masonry-item"><img src="" data-src="https://i.ibb.co/5hM5YHyC/Picsew-20260220172014.avif" alt="" /></div>
+    <div class="masonry-item"><img src="" data-src="https://i.ibb.co/3mTFjSsJ/Picsew-20260220171957.avif" alt="" /></div>
+    <div class="masonry-item"><img src="" data-src="https://i.ibb.co/3yHtrF6z/Picsew-20260220171936.avif" alt="" /></div>
+    <div class="masonry-item"><img src="" data-src="https://i.ibb.co/DfkhpR6m/Picsew-20260220171934.avif" alt="" /></div>
+    <div class="masonry-item"><img src="" data-src="https://i.ibb.co/7xrfgkRb/Picsew-20260220171926.avif" alt="" /></div>
+    <div class="masonry-item"><img src="" data-src="https://i.ibb.co/FkD33Ddb/Picsew-20260220171931.avif" alt="" /></div>
+    <div class="masonry-item"><img src="" data-src="https://i.ibb.co/N2kvQDdj/Picsew-20260220171954.avif" alt="" /></div>
+    <div class="masonry-item"><img src="" data-src="https://i.ibb.co/kVwrMgh2/Picsew-20260220172016.avif" alt="" /></div>
+    <div class="masonry-item"><img src="" data-src="https://i.ibb.co/WW1M5ZjQ/Picsew-20260220171949.avif" alt="" /></div>
+    <div class="masonry-item"><img src="" data-src="https://i.ibb.co/TBY97MPJ/Picsew-20260220171951.avif" alt="" /></div>
+    <div class="masonry-item"><img src="" data-src="https://i.ibb.co/LXpW6hR3/Picsew-20260220172011.avif" alt="" /></div>
+    <div class="masonry-item"><img src="" data-src="https://i.ibb.co/HTY0g9d2/Picsew-20260220171942.avif" alt="" /></div>
+    <div class="masonry-item"><img src="" data-src="https://i.ibb.co/dsXqD0gZ/Picsew-20260220172008.avif" alt="" /></div>
+    <div class="masonry-item"><img src="" data-src="https://i.ibb.co/qLM7k99z/Picsew-20260220172005.avif" alt="" /></div>
+    <div class="masonry-item"><img src="" data-src="https://i.ibb.co/XkjCbk9t/Picsew-20260220171915.avif" alt="" /></div>
+    <div class="masonry-item"><img src="" data-src="https://i.ibb.co/sv59VxBC/Picsew-20260220172003.avif" alt="" /></div>
+    <div class="masonry-item"><img src="" data-src="https://i.ibb.co/mCcjKDmS/Picsew-20260220171912.avif" alt="" /></div>
+    <div class="masonry-item"><img src="" data-src="https://i.ibb.co/r2WNr4nK/Picsew-20260220171924.avif" alt="" /></div>
+    <div class="masonry-item"><img src="" data-src="https://i.ibb.co/Cp88XLYk/Picsew-20260220171921.avif" alt="" /></div>
+    <div class="masonry-item"><img src="" data-src="https://i.ibb.co/PsZbHT32/Picsew-20260220171918.avif" alt="" /></div>
   </div>
 
   <div class="pagination" id="pagination"></div>
@@ -384,7 +386,17 @@
         var start = (page - 1) * ITEMS_PER_PAGE;
         var end = start + ITEMS_PER_PAGE;
         cards.forEach(function(card, i) {
-          card.style.display = (i >= start && i < end) ? '' : 'none';
+          if (i >= start && i < end) {
+            card.style.display = '';
+            // Загружаем изображение только сейчас
+            var img = card.querySelector('img[data-src]');
+            if (img) {
+              img.src = img.getAttribute('data-src');
+              img.removeAttribute('data-src');
+            }
+          } else {
+            card.style.display = 'none';
+          }
         });
         renderPagination();
         window.scrollTo({ top: 0, behavior: 'smooth' });
